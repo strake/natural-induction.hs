@@ -1,5 +1,6 @@
 module Data.Natural.Class where
 
+import Prelude hiding (iterate)
 import Data.Functor.Const
 import Data.Peano
 import Data.Proxy
@@ -14,5 +15,8 @@ instance Natural n => Natural (Succ n) where
     natural _ sf = sf
 
 reify :: Natural n => Const Peano n
-reify = natural (Const Zero) (succ' reify)
-  where succ' = Const . Succ . getConst :: Const Peano n -> Const Peano (Succ n)
+reify = iterate Succ Zero
+
+iterate :: ∀ n a . Natural n => (a -> a) -> a -> Const a n
+iterate f a = natural (Const a) (f' (iterate f a))
+  where f' = Const . f . getConst :: ∀ n . Const a n -> Const a (Succ n)
