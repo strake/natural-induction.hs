@@ -13,6 +13,6 @@ instance Natural Zero where
 instance Natural n => Natural (Succ n) where
     natural _ sf = sf
 
-reify :: Natural n => Proxy n -> Peano
-reify (Proxy :: Proxy n) = getConst $ natural @n (Const Zero) (φ $ Const . Succ . reify)
-  where φ = ($ Proxy) :: ∀ f a . (Proxy a -> f a) -> f a
+reify :: Natural n => Const Peano n
+reify = natural (Const Zero) (succ' reify)
+  where succ' = Const . Succ . getConst :: Const Peano n -> Const Peano (Succ n)
